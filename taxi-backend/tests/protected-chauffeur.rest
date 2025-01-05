@@ -1,0 +1,50 @@
+### Variables
+@baseUrl = http://localhost:3002/api
+@contentType = application/json
+
+### 1. Authentification chauffeur
+# @name login
+POST {{baseUrl}}/auth/verify-otp
+Content-Type: {{contentType}}
+
+{
+    "telephone": "+21612345678",
+    "code": "XXXXX"  # Remplacer par le code reçu
+}
+
+### Sauvegarder le token
+@authToken = {{login.response.body.data.token}}
+
+### 2. Obtenir le profil chauffeur
+GET {{baseUrl}}/chauffeurs/profile
+Authorization: Bearer {{authToken}}
+
+### 3. Mettre à jour le profil chauffeur
+PATCH {{baseUrl}}/chauffeurs/profile
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+    "email": "nouveau@email.com",
+    "vehicule": {
+        "marque": "Mercedes",
+        "modele": "Classe S",
+        "annee": 2024
+    }
+}
+
+### 4. Mettre à jour la disponibilité
+PATCH {{baseUrl}}/chauffeurs/disponibilite
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+    "disponible": false
+}
+
+### 5. Test accès non autorisé (avec token client)
+GET {{baseUrl}}/chauffeurs/profile
+Authorization: Bearer TOKEN_CLIENT_ICI
+
+### 6. Test sans token
+GET {{baseUrl}}/chauffeurs/profile 

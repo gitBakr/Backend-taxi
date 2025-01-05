@@ -1,0 +1,40 @@
+### Variables
+@baseUrl = http://localhost:3000/api
+@contentType = application/json
+
+### AUTHENTIFICATION ###
+
+### 1. Demander un code OTP
+POST {{baseUrl}}/auth/send-otp
+Content-Type: {{contentType}}
+
+{
+    "telephone": "+21698765437"
+}
+
+### 2. Vérifier le code OTP
+# Note: Utilisez le code affiché dans la console
+POST {{baseUrl}}/auth/verify-otp
+Content-Type: {{contentType}}
+
+{
+    "telephone": "+21698765437",
+    "code": "319182"
+}
+
+### 3. Test avec numéro invalide
+POST {{baseUrl}}/auth/send-otp
+Content-Type: {{contentType}}
+
+{
+    "telephone": "123"
+}
+
+### 4. Test avec code invalide
+POST {{baseUrl}}/auth/verify-otp
+Content-Type: {{contentType}}
+
+{
+    "telephone": "+21698765432",
+    "code": "000000"
+} 

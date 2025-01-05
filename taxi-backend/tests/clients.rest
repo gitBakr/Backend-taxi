@@ -1,0 +1,36 @@
+### Variables
+@baseUrl = http://localhost:3000/api
+@contentType = application/json
+
+### CLIENTS ###
+
+### 1. Créer un nouveau client
+POST {{baseUrl}}/clients
+Content-Type: {{contentType}}
+
+{
+    "nom": "Abdelli1",
+    "prenom": "Raoua1",
+    "email": "raoua.abdelli8@example.com",
+    "telephone": "+21698765437"
+}
+
+### 2. Obtenir tous les clients
+GET {{baseUrl}}/clients
+
+### 3. Obtenir un client spécifique
+# Copiez l'ID depuis la réponse précédente
+GET {{baseUrl}}/clients/[ID_DU_CLIENT]
+
+### 4. Mettre à jour un client
+# Copiez l'ID depuis la réponse précédente
+PATCH {{baseUrl}}/clients/[ID_DU_CLIENT]
+Content-Type: {{contentType}}
+
+{
+    "nom": "Abdelli Updated"
+}
+
+### 5. Supprimer un client
+# Copiez l'ID depuis la réponse précédente
+DELETE {{baseUrl}}/clients/[ID_DU_CLIENT] 

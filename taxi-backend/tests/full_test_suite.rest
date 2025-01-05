@@ -1,0 +1,333 @@
+
+@baseUrl = http://localhost:3002/api
+@contentType = application/json
+@authToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzdhMzU2Y2Q4M2ZlZGE5ZDgzNTljZDciLCJyb2xlIjoiY2xpZW50IiwiaWF0IjoxNzM2MDYyNDAwLCJleHAiOjE3MzYxNDg4MDB9.pnYR7DBzbac0Pe75a1EqoXKQA9NKVdHwwy2c13P8zNg
+@chauffeurToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzdhMzkwMzVlNmEzYjViYTc1YTc3MTMiLCJyb2xlIjoiY2hhdWZmZXVyIiwiaWF0IjoxNzM2MDY4NTEwLCJleHAiOjE3MzYxNTQ5MTB9.rHmYTS2ggtaVy48I7Xn0VS7pPWTz02G1lpNHOnzVp5k
+@chauffeurId = 677a39035e6a3b5ba75a7713
+@clientId = 67794f2e252b8fbcf2d525a9
+@reservationId = null 
+
+
+### SUITE DE TESTS COMPLÈTE ###
+
+### ====== 1. AUTHENTIFICATION ====== ###
+
+### 1.1 Créer un nouveau client
+POST {{baseUrl}}/clients
+Content-Type: {{contentType}}
+
+{
+    "nom": "Test",
+    "prenom": "Client",
+    "email": "test1.client@example.com",
+    "telephone": "+21698765441"
+}
+
+# Résultat attendu:
+# - Status: 201
+# - Message: Client créé avec succès
+# - Données du client retournées
+
+### 1.2 Demander un code OTP
+POST {{baseUrl}}/auth/send-otp
+Content-Type: {{contentType}}
+
+{
+    "telephone": "+21698765441"
+}
+
+# Résultat attendu:
+# - Status: 200
+# - Message: Code envoyé avec succès
+
+### 1.3 Vérifier le code OTP
+POST {{baseUrl}}/auth/verify-otp
+Content-Type: {{contentType}}
+
+{
+    "telephone": "+21698765441",
+    "code": "259009"  
+}
+
+# Résultat attendu:
+# - Status: 200
+# - Token JWT
+# - Données utilisateur
+
+### ====== 2. GESTION DES CHAUFFEURS ====== ###
+
+### 2.1 Créer un nouveau chauffeur
+POST {{baseUrl}}/chauffeurs
+Content-Type: {{contentType}}
+
+{
+    "nom": "Test",
+    "prenom": "Chauffeur",
+    "email": "test.chauffeur2@example.com",
+    "telephone": "+21698765442",
+    "vehicule": {
+        "marque": "Mercedes",
+        "modele": "Classe E",
+        "annee": 2022
+    }
+}
+
+# Résultat attendu:
+# - Status: 201
+# - Message: Chauffeur créé avec succès 
+### 2.2 Demander OTP pour le chauffeur
+POST {{baseUrl}}/auth/send-otp
+Content-Type: {{contentType}}
+
+{
+    "telephone": "+21698765442"
+}
+
+
+### 2.3 Vérifier OTP et obtenir le token chauffeur
+POST {{baseUrl}}/auth/verify-otp
+Content-Type: {{contentType}}
+
+{
+    "telephone": "+21698765442",
+    "code": "254687"  
+}
+
+# Le token sera dans la réponse :
+# {
+#   "status": "success",
+#   "data": {
+#     "token": "eyJhbGci..." <- Copier ce token
+#   }
+# }
+
+### ====== 3. GESTION DES RÉSERVATIONS ====== ###
+
+### 3.1 Créer une réservation (Client)
+POST {{baseUrl}}/reservations
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+    "chauffeur": "677a39035e6a3b5ba75a7713",
+    "trajet": {
+        "villeDepart": "Tunis",
+        "villeArrivee": "Sousse",
+        "dateDepart": "2025-03-20T15:00:00Z",
+        "dureeEstimee": 120,
+        "distanceEstimee": 140
+    },
+    "paiement": {
+        "montantBase": 120,
+        "commission": 12,
+        "montantTotal": 132
+    }
+}
+
+# Résultat attendu:
+# - Status: 201
+# - Message: Réservation créée avec succès
+# - ID de réservation retourné
+
+### 3.2 Confirmer une réservation (Chauffeur)
+PATCH {{baseUrl}}/reservations/677a39f35e6a3b5ba75a7718/confirmer
+Authorization: Bearer {{chauffeurToken}}
+Content-Type: {{contentType}}
+
+# Résultat attendu:
+# - Status: 200
+# - Message: Réservation confirmée
+# - Statut mis à jour
+
+### 3.3 Démarrer une course
+PATCH {{baseUrl}}/reservations/677a39f35e6a3b5ba75a7718/demarrer
+Authorization: Bearer {{chauffeurToken}}
+Content-Type: {{contentType}}
+
+# Résultat attendu:
+# - Status: 200
+# - Message: Course démarrée
+# - Statut mis à jour
+
+### 3.4 Terminer une course
+PATCH {{baseUrl}}/reservations/677a39f35e6a3b5ba75a7718/terminer
+Authorization: Bearer {{chauffeurToken}}
+Content-Type: {{contentType}}
+
+{
+    "confirmation": true
+}
+
+# Résultat attendu:
+# - Status: 200
+# - Message: Course terminée
+# - Statut final mis à jour
+
+### 3.2 Confirmer la réservation (Chauffeur)
+PATCH {{baseUrl}}/reservations/677a3c0e5e6a3b5ba75a7749/confirmer
+Authorization: Bearer {{chauffeurToken}}
+Content-Type: {{contentType}}
+
+# Résultat attendu:
+# - Status: 200
+# - Message: Réservation confirmée
+# - Statut: "confirmee"
+
+### 3.3 Démarrer la course (Chauffeur)
+PATCH {{baseUrl}}/reservations/677a3c0e5e6a3b5ba75a7749/demarrer
+Authorization: Bearer {{chauffeurToken}}
+Content-Type: {{contentType}}
+
+# Résultat attendu:
+# - Status: 200
+# - Message: Course démarrée
+# - Statut: "en_cours"
+
+### 3.4 Terminer la course (Chauffeur)
+PATCH {{baseUrl}}/reservations/677a3c0e5e6a3b5ba75a7749/terminer
+Authorization: Bearer {{chauffeurToken}}
+Content-Type: {{contentType}}
+
+{
+    "confirmation": true
+}
+
+# Résultat attendu:
+# - Status: 200
+# - Message: Course terminée
+# - Statut: "terminee"
+### 4.1 Initier un paiement par carte
+POST {{baseUrl}}/paiements/initier
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+    "reservationId": "677a3c0e5e6a3b5ba75a7749",
+    "methode": "carte",
+    "paymentMethod": {
+        "type": "card",
+        "token": "tok_visa"
+    }
+}
+### 4.2 Confirmer le paiement
+POST {{baseUrl}}/paiements/confirmer/pi_3QdovXHyjf3wZJG10ZwGMmNL
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+    "card": "tok_visa",
+    "confirmation": true
+}
+
+### ====== 5. GESTION DES REMBOURSEMENTS ====== ###
+
+### 5.1 Rembourser un paiement
+POST {{baseUrl}}/paiements/rembourser/pi_3QdovXHyjf3wZJG10ZwGMmNL
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+    "montant": 132,
+    "raison": "requested_by_customer"
+}
+
+# Résultat attendu:
+# - Status: 200
+# - Message: Remboursement effectué avec succès
+# - Statut: "rembourse"
+
+### 5.2 Vérifier le statut du remboursement
+GET {{baseUrl}}/paiements/pi_3QdovXHyjf3wZJG10ZwGMmNL
+Authorization: Bearer {{authToken}}
+
+# Résultat attendu:
+# - Status: 200
+# - Statut: "rembourse"
+# - Détails du remboursement
+
+
+### 1. Ajouter des trajets
+POST {{baseUrl}}/chauffeurs/trajets
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzdhMzkwMzVlNmEzYjViYTc1YTc3MTMiLCJyb2xlIjoiY2hhdWZmZXVyIiwiaWF0IjoxNzM2MDY4NTEwLCJleHAiOjE3MzYxNTQ5MTB9.rHmYTS2ggtaVy48I7Xn0VS7pPWTz02G1lpNHOnzVp5k
+Content-Type: application/json
+
+{
+    "trajets": [
+        {
+            "villeDepart": "677a517ad895cc4faa372a2a",
+            "villeArrivee": "677a517ad895cc4faa372a2b",
+            "prixBase": 120
+        }
+    ]
+}
+### Voir les villes disponibles
+GET {{baseUrl}}/villes/disponibles
+
+### 2. Voir mes trajets
+GET {{baseUrl}}/chauffeurs/trajets
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzdhMzkwMzVlNmEzYjViYTc1YTc3MTMiLCJyb2xlIjoiY2hhdWZmZXVyIiwiaWF0IjoxNzM2MDY4NTEwLCJleHAiOjE3MzYxNTQ5MTB9.rHmYTS2ggtaVy48I7Xn0VS7pPWTz02G1lpNHOnzVp5k
+
+### 3. Modifier un tarif spécifique
+### 2. Voir mes trajets
+GET {{baseUrl}}/chauffeurs/trajets
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzdhMzkwMzVlNmEzYjViYTc1YTc3MTMiLCJyb2xlIjoiY2hhdWZmZXVyIiwiaWF0IjoxNzM2MDY4NTEwLCJleHAiOjE3MzYxNTQ5MTB9.rHmYTS2ggtaVy48I7Xn0VS7pPWTz02G1lpNHOnzVp5k
+
+### Supprimer le tarif invalide
+DELETE {{baseUrl}}/chauffeurs/trajets/677a4ed9fc90b2206905bedc
+Authorization:  Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzdhMzkwMzVlNmEzYjViYTc1YTc3MTMiLCJyb2xlIjoiY2hhdWZmZXVyIiwiaWF0IjoxNzM2MDY4NTEwLCJleHAiOjE3MzYxNTQ5MTB9.rHmYTS2ggtaVy48I7Xn0VS7pPWTz02G1lpNHOnzVp5k
+
+### 3. Modifier le tarif
+PATCH {{baseUrl}}/chauffeurs/trajets/677a4ed9fc90b2206905bedc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzdhMzkwMzVlNmEzYjViYTc1YTc3MTMiLCJyb2xlIjoiY2hhdWZmZXVyIiwiaWF0IjoxNzM2MDY4NTEwLCJleHAiOjE3MzYxNTQ5MTB9.rHmYTS2ggtaVy48I7Xn0VS7pPWTz02G1lpNHOnzVp5k
+Content-Type: application/json
+
+{
+    "prixBase": 130
+}
+
+### Ajouter un trajet Djerba-Tataouine
+POST {{baseUrl}}/chauffeurs/trajets
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzdhMzkwMzVlNmEzYjViYTc1YTc3MTMiLCJyb2xlIjoiY2hhdWZmZXVyIiwiaWF0IjoxNzM2MDY4NTEwLCJleHAiOjE3MzYxNTQ5MTB9.rHmYTS2ggtaVy48I7Xn0VS7pPWTz02G1lpNHOnzVp5k
+Content-Type: application/json
+
+{
+    "trajets": [
+        {
+            "villeDepart": "677a60300586dd1da5f669c1",
+            "villeArrivee": "677a60300586dd1da5f669c9",
+            "prixBase": 90
+        }
+    ]
+}
+
+### Ajouter un trajet Djerba-Zarzis
+POST {{baseUrl}}/chauffeurs/trajets
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzdhMzkwMzVlNmEzYjViYTc1YTc3MTMiLCJyb2xlIjoiY2hhdWZmZXVyIiwiaWF0IjoxNzM2MDY4NTEwLCJleHAiOjE3MzYxNTQ5MTB9.rHmYTS2ggtaVy48I7Xn0VS7pPWTz02G1lpNHOnzVp5k
+Content-Type: application/json
+
+{
+    "trajets": [
+        {
+            "villeDepart": "677a60300586dd1da5f669c1",  
+            "villeArrivee": "677a60300586dd1da5f669c7",  
+            "prixBase": 45
+        }
+    ]
+}
+
+### Créer un compte admin
+POST http://localhost:3002/api/auth/register-admin
+Content-Type: application/json
+
+{
+    "nom": "Admin",
+    "prenom": "Super",
+    "email": "admin@taxi.com",
+    "telephone": "+21698765432",
+    "password": "Admin123!",
+    "codeSecret": "Admin123!"
+}
+
+# ### Voir les stats du dashboard
+# GET {{baseUrl}}/api/admin/dashboard
+# Authorization: Bearer {{adminToken}}
