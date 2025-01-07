@@ -1,11 +1,12 @@
 ### Variables Production
 @baseUrl = https://backend-taxi-e2lz.onrender.com/api
 @contentType = application/json
+@authTokenClient = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzdkODI0MDljZDdjZDcxMzZhZjUzNWEiLCJyb2xlIjoiY2hhdWZmZXVyIiwiaWF0IjoxNzM2Mjc4NjQ0LCJleHAiOjE3MzYzNjUwNDR9.FeomR7d7NHYt1b77iRXAcY2C3cTDeeYwsiT7S0kmq0M
 
 ### 1. Créer une réservation
 POST {{baseUrl}}/reservations
 Content-Type: {{contentType}}
-Authorization: Bearer {{authToken}}
+Authorization: Bearer {{authTokenClient}}
 
 {
     "chauffeur": "CHAUFFEUR_ID",
@@ -19,4 +20,4 @@ Authorization: Bearer {{authToken}}
 
 ### 2. Obtenir une réservation
 GET {{baseUrl}}/reservations/RESERVATION_ID
-Authorization: Bearer {{authToken}} 
+Authorization: Bearer {{authTokenClient}} 

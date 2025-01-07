@@ -16,8 +16,16 @@ const paiementRoutes = require('./routes/paiementRoutes');
 
 const app = express();
 
-// Middleware standard
-app.use(cors());
+// Middleware CORS
+app.use(cors({
+    origin: [
+        'https://front-client-taxi.onrender.com',
+        'http://localhost:3000'  // Pour le développement local
+    ],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+}));
 
 // Routes spéciales (avant express.json)
 app.post('/api/webhooks/stripe', express.raw({ type: 'application/json' }), webhookRoutes);

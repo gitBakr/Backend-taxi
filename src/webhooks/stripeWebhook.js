@@ -5,6 +5,26 @@ const Reservation = require('../models/Reservation');
 const Paiement = require('../models/Paiement');
 const NotificationService = require('../services/notificationService');
 
+const logger = {
+    error: (message, error) => {
+        console.error('\n❌ ERREUR STRIPE WEBHOOK ❌');
+        console.error('================================');
+        console.error('Message:', message);
+        console.error('Erreur:', error);
+        console.error('Stack:', error.stack);
+        console.error('================================\n');
+    },
+    info: (message, data = {}) => {
+        console.log('\n✅ INFO STRIPE WEBHOOK ✅');
+        console.log('================================');
+        console.log('Message:', message);
+        if (Object.keys(data).length) {
+            console.log('Données:', JSON.stringify(data, null, 2));
+        }
+        console.log('================================\n');
+    }
+};
+
 router.post('/', express.raw({type: 'application/json'}), async (req, res) => {
     try {
         const sig = req.headers['stripe-signature'];
@@ -35,8 +55,8 @@ router.post('/', express.raw({type: 'application/json'}), async (req, res) => {
 
         res.json({received: true});
     } catch (error) {
-        console.error('Webhook error:', error);
-        res.status(500).json({error: error.message});
+        logger.error('Erreur traitement webhook', error);
+        return res.status(400).send(`Webhook Error: ${error.message}`);
     }
 });
 

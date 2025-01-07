@@ -1,20 +1,21 @@
 ### Variables Production
 @baseUrl = https://backend-taxi-e2lz.onrender.com/api
 @contentType = application/json
-@telephone = +21698765440
+@telephone = +21698765449
 
 ### 1. Créer un nouveau client
 POST {{baseUrl}}/clients
 Content-Type: {{contentType}}
 
 {
-    "nom": "Test Prod",
-    "prenom": "Client1",
-    "email": "test.prod1@example.com",
+    "nom": "Test Prod2",
+    "prenom": "Client2",
+    "email": "test.prod2@example.com",
     "telephone": "{{telephone}}"
 }
 
 ### 2. Demander OTP
+# @name sendOTP
 POST {{baseUrl}}/auth/send-otp
 Content-Type: {{contentType}}
 
@@ -22,14 +23,16 @@ Content-Type: {{contentType}}
     "telephone": "{{telephone}}"
 }
 
-### 3. Voir le dernier code OTP (développement uniquement)
-GET {{baseUrl}}/auth/debug/last-otp/{{telephone}}
+### 2. Voir le dernier code (TEMPORAIRE - À SUPPRIMER EN PRODUCTION)
+GET {{baseUrl}}/auth/test-otp/{{telephone}}
 
-### 4. Vérifier OTP
+### 3. Utiliser le code reçu
 POST {{baseUrl}}/auth/verify-otp
 Content-Type: {{contentType}}
 
 {
     "telephone": "{{telephone}}",
-    "code": "REMPLACER_PAR_CODE_RECU"
+    "code": "644198"  
 } 
+#token client 
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzdkODI0MDljZDdjZDcxMzZhZjUzNWEiLCJyb2xlIjoiY2hhdWZmZXVyIiwiaWF0IjoxNzM2Mjc4NjQ0LCJleHAiOjE3MzYzNjUwNDR9.FeomR7d7NHYt1b77iRXAcY2C3cTDeeYwsiT7S0kmq0M

@@ -4,12 +4,16 @@ class SMSService {
   }
 
   async sendSMS(to, message) {
-    // Logger le code OTP pour la production
-    console.log('\n=== SMS ENVOYÉ ===');
+    // Extraire le code OTP
+    const otpCode = message.match(/\d{6}/)[0];
+    
+    // Log détaillé pour Render
+    console.log('\n🔐 NOUVEAU CODE OTP GÉNÉRÉ 🔐');
+    console.log('==========================');
     console.log(`📱 Téléphone: ${to}`);
-    console.log(`📝 Message: ${message}`);
-    console.log('Code OTP:', message.match(/\d{6}/)[0]);  // Extrait le code à 6 chiffres
-    console.log('================\n');
+    console.log(`🔑 Code: ${otpCode}`);
+    console.log(`⏰ Date: ${new Date().toISOString()}`);
+    console.log('==========================\n');
 
     // En développement, simuler l'envoi
     if (this.isDev) {
