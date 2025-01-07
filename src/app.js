@@ -7,14 +7,13 @@ const authRoutes = require('./routes/authRoutes');
 const villeRoutes = require('./routes/villeRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const webhookRoutes = require('./webhooks/stripeWebhook');
-const { findAvailablePort, updateRestFiles } = require('./utils/portUtils');
 const trajetRoutes = require('./routes/trajetRoutes');
 const prixRoutes = require('./routes/prixRoutes');
 const distanceRoutes = require('./routes/distanceRoutes');
 
 const app = express();
 
-// Middleware pour Stripe webhook
+// Middleware pour Stripe webhook (avant express.json())
 app.post('/api/webhooks/stripe', express.raw({ type: 'application/json' }), webhookRoutes);
 
 // Middleware standard
@@ -38,7 +37,7 @@ app.use((req, res) => {
     });
 });
 
-// Connexion à MongoDB et démarrage du serveur
+// Démarrage du serveur
 const startServer = async () => {
   try {
     const port = process.env.PORT || 3000;
@@ -48,21 +47,23 @@ const startServer = async () => {
       throw new Error('MONGODB_URI is not defined in environment variables');
     }
 
+    // Une seule connexion MongoDB
     await mongoose.connect(process.env.MONGODB_URI);
-    console.log('MongoDB Atlas Connected:', mongoose.connection.host);
+    console.log('✅ MongoDB Atlas Connected:', mongoose.connection.host);
 
     app.listen(port, () => {
-      console.log(`Server is running on port ${port}`);
+      console.log(`🚀 Server is running on port ${port}`);
     });
 
     // Gestion de l'arrêt propre
-    process.on('SIGTERM', () => {
-      console.log('Server closed.');
+    process.on('SIGTERM', async () => {
+      await mongoose.connection.close();
+      console.log('👋 Server closed.');
       process.exit(0);
     });
 
   } catch (error) {
-    console.error('Server startup error:', error);
+    console.error('❌ Server startup error:', error);
     process.exit(1);
   }
 };
