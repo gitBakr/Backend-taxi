@@ -1,7 +1,19 @@
 ### Variables Production
 @baseUrl = https://backend-taxi-e2lz.onrender.com/api
 @contentType = application/json
-@stripeKey = sk_test_51OgnMoHyjf3wZJG1...
+
+### Authentification pour obtenir le token
+# @name login
+POST {{baseUrl}}/auth/verify-otp
+Content-Type: {{contentType}}
+
+{
+    "telephone": "+21698765441",
+    "code": "123456"
+}
+
+### Sauvegarder le token de la réponse précédente
+@authToken = {{login.response.body.data.token}}
 
 ### 1. Créer un paiement
 POST {{baseUrl}}/paiements/initier

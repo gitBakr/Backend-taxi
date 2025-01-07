@@ -11,25 +11,31 @@ const trajetRoutes = require('./routes/trajetRoutes');
 const prixRoutes = require('./routes/prixRoutes');
 const distanceRoutes = require('./routes/distanceRoutes');
 const baseRoutes = require('./routes/baseRoutes');
+const clientRoutes = require('./routes/clientRoutes');
+const paiementRoutes = require('./routes/paiementRoutes');
 
 const app = express();
 
-// Middleware pour Stripe webhook (avant express.json())
-app.post('/api/webhooks/stripe', express.raw({ type: 'application/json' }), webhookRoutes);
-
 // Middleware standard
-app.use(express.json());
 app.use(cors());
 
-// Routes API
-app.use('/api', baseRoutes);
+// Routes spéciales (avant express.json)
+app.post('/api/webhooks/stripe', express.raw({ type: 'application/json' }), webhookRoutes);
+
+// Middleware JSON pour les autres routes
+app.use(express.json());
+
+// Routes API (ordre important)
+app.use('/api', baseRoutes);  // Routes de base en premier
 app.use('/api/auth', authRoutes);
+app.use('/api/clients', clientRoutes);
 app.use('/api/villes', villeRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/trajets', trajetRoutes);
 app.use('/api/prix', prixRoutes);
 app.use('/api/distance', distanceRoutes);
-app.use('/api', routes);
+app.use('/api/paiements', paiementRoutes);
+app.use('/api', routes);  // Routes génériques en dernier
 
 // Gestion des erreurs 404
 app.use((req, res) => {
