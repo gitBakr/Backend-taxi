@@ -10,6 +10,7 @@ const webhookRoutes = require('./webhooks/stripeWebhook');
 const trajetRoutes = require('./routes/trajetRoutes');
 const prixRoutes = require('./routes/prixRoutes');
 const distanceRoutes = require('./routes/distanceRoutes');
+const baseRoutes = require('./routes/baseRoutes');
 
 const app = express();
 
@@ -21,13 +22,14 @@ app.use(express.json());
 app.use(cors());
 
 // Routes API
+app.use('/api', baseRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/villes', villeRoutes);
 app.use('/api/admin', adminRoutes);
-app.use('/api', routes);
 app.use('/api/trajets', trajetRoutes);
 app.use('/api/prix', prixRoutes);
 app.use('/api/distance', distanceRoutes);
+app.use('/api', routes);
 
 // Gestion des erreurs 404
 app.use((req, res) => {
