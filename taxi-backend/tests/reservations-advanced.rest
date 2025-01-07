@@ -1,0 +1,74 @@
+### Variables
+@baseUrl = http://localhost:3002/api
+@contentType = application/json
+@authToken = {{login.response.body.data.token}}
+
+### 1. Authentification client
+# @name login
+POST {{baseUrl}}/auth/verify-otp
+Content-Type: {{contentType}}
+
+{
+    "telephone": "+21612345678",
+    "code": "XXXXX"  # Remplacer par le code reçu
+}
+
+### 2. Créer une nouvelle réservation
+POST {{baseUrl}}/reservations
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+    "chauffeur": "CHAUFFEUR_ID",
+    "trajet": {
+        "villeDepart": "Tunis",
+        "villeArrivee": "Sousse",
+        "dateDepart": "{{$datetime iso8601 1}}", // Date dans 1 heure
+        "dureeEstimee": 120,
+        "distanceEstimee": 140
+    },
+    "paiement": {
+        "montantBase": 120
+    }
+}
+
+### 3. Authentification chauffeur pour confirmation
+# @name loginChauffeur
+POST {{baseUrl}}/auth/verify-otp
+Content-Type: {{contentType}}
+
+{
+    "telephone": "+21612345679",
+    "code": "XXXXX"  # Remplacer par le code reçu
+}
+
+### Sauvegarder le token chauffeur
+@chauffeurToken = {{loginChauffeur.response.body.data.token}}
+
+### 4. Confirmer la réservation (chauffeur)
+PATCH {{baseUrl}}/reservations/RESERVATION_ID/confirmer
+Authorization: Bearer {{chauffeurToken}}
+Content-Type: {{contentType}}
+
+### 5. Vérifier le statut de la réservation
+GET {{baseUrl}}/reservations/RESERVATION_ID
+Authorization: Bearer {{authToken}}
+
+### 6. Test conflit de réservation
+POST {{baseUrl}}/reservations
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+    "chauffeur": "CHAUFFEUR_ID",
+    "trajet": {
+        "villeDepart": "Tunis",
+        "villeArrivee": "Sfax",
+        "dateDepart": "{{$datetime iso8601 1}}", // Même créneau que la première réservation
+        "dureeEstimee": 180,
+        "distanceEstimee": 270
+    },
+    "paiement": {
+        "montantBase": 200
+    }
+} 

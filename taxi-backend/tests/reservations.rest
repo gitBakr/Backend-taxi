@@ -1,0 +1,85 @@
+### Variables
+@baseUrl = http://localhost:3000/api
+@contentType = application/json
+@authToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2Nzc5NGYyZTI1MmI4ZmJjZjJkNTI1YTkiLCJyb2xlIjoiY2xpZW50IiwiaWF0IjoxNzM2MDAzNDY0LCJleHAiOjE3MzYwODk4NjR9.WWZp7nI6-PvLjqrlWfIutEj_98rlVrvqKNWQdDvqXlY
+@chauffeurToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2Nzc5NGMzZjI1MmI4ZmJjZjJkNTI1OGUiLCJyb2xlIjoiY2hhdWZmZXVyIiwiaWF0IjoxNzM2MDAzMDA0LCJleHAiOjE3MzYwODk0MDR9.8CHH-uWxrsPdu9C8pV2WqjyfRhRSeVifeWoWthV14DQ
+
+### Test 1: Créer une réservation avec date invalide (passée)
+POST {{baseUrl}}/reservations
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+    "chauffeur": "67794c3f252b8fbcf2d5258e",
+    "trajet": {
+        "villeDepart": "Tunis",
+        "villeArrivee": "Sousse",
+        "dateDepart": "2023-03-20T15:00:00Z",
+        "dureeEstimee": 120,
+        "distanceEstimee": 140
+    },
+    "paiement": {
+        "montantBase": 120,
+        "commission": 12,
+        "montantTotal": 132
+    }
+}
+
+### Test 2: Créer une réservation avec date valide (future)
+POST {{baseUrl}}/reservations
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+    "chauffeur": "67794c3f252b8fbcf2d5258e",
+    "trajet": {
+        "villeDepart": "Tunis",
+        "villeArrivee": "Sousse",
+        "dateDepart": "2025-03-20T15:00:00Z",
+        "dureeEstimee": 120,
+        "distanceEstimee": 140
+    },
+    "paiement": {
+        "montantBase": 120,
+        "commission": 12,
+        "montantTotal": 132
+    }
+}
+
+### Test 3: Tenter de confirmer une réservation avec un token client (doit échouer)
+PATCH {{baseUrl}}/reservations/67795821a5b5159842d68d3a/confirmer
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+### Test 4: Confirmer une réservation avec un token chauffeur
+PATCH {{baseUrl}}/reservations/67795821a5b5159842d68d3a/confirmer
+Authorization: Bearer {{chauffeurToken}}
+Content-Type: {{contentType}}
+
+### Test 5: Démarrer une course non confirmée (doit échouer)
+PATCH {{baseUrl}}/reservations/RESERVATION_ID/demarrer
+Authorization: Bearer {{chauffeurToken}}
+Content-Type: {{contentType}}
+
+### Test 6: Démarrer une course confirmée
+PATCH {{baseUrl}}/reservations/67795821a5b5159842d68d3a/demarrer
+Authorization: Bearer {{chauffeurToken}}
+Content-Type: {{contentType}}
+
+### Test 7: Terminer une course non démarrée (doit échouer)
+PATCH {{baseUrl}}/reservations/67795821a5b5159842d68d3a/terminer
+Authorization: Bearer {{chauffeurToken}}
+Content-Type: {{contentType}}
+
+### Test 8: Terminer une course démarrée
+PATCH {{baseUrl}}/reservations/67795821a5b5159842d68d3a/terminer
+Authorization: Bearer {{chauffeurToken}}
+Content-Type: {{contentType}}
+
+### Test 9: Obtenir les détails d'une réservation (client)
+GET {{baseUrl}}/reservations/67795821a5b5159842d68d3a
+Authorization: Bearer {{authToken}}
+
+### Test 10: Obtenir les détails d'une réservation (chauffeur)
+GET {{baseUrl}}/reservations/67795821a5b5159842d68d3a
+Authorization: Bearer {{chauffeurToken}}

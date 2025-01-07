@@ -1,0 +1,6 @@
+### Variables
+@baseUrl = http://localhost:3002/api
+@contentType = application/json
+
+### Test Health Check
+GET {{baseUrl}}/health 

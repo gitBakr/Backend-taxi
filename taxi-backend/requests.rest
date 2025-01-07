@@ -1,0 +1,35 @@
+### Variables
+@baseUrl = http://localhost:3002/api
+@contentType = application/json
+
+### Test Health Check
+GET {{baseUrl}}/health
+
+### Créer un nouveau client
+POST {{baseUrl}}/clients
+Content-Type: {{contentType}}
+
+{
+    "nom": "Doe",
+    "prenom": "John",
+    "email": "john.doe@example.com",
+    "telephone": "+21612345678"
+}
+
+### Obtenir tous les clients
+GET {{baseUrl}}/clients
+
+### Obtenir un client par ID (remplacer l'ID)
+GET {{baseUrl}}/clients/677922a3e4a250b0923be79c
+
+### Mettre à jour un client
+PATCH {{baseUrl}}/clients/677922a3e4a250b0923be79c
+Content-Type: {{contentType}}
+
+{
+    "nom": "Doe Updated",
+    "telephone": "+21612345679"
+}
+
+### Supprimer un client
+DELETE {{baseUrl}}/clients/677922a3e4a250b0923be79c 

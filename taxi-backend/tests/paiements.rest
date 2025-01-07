@@ -1,0 +1,39 @@
+### Variables
+@baseUrl = http://localhost:3000/api
+@contentType = application/json
+@authToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2Nzc5NGYyZTI1MmI4ZmJjZjJkNTI1YTkiLCJyb2xlIjoiY2xpZW50IiwiaWF0IjoxNzM2MDMwNTgyLCJleHAiOjE3MzYxMTY5ODJ9.6ITUTVjMQfcILawvJEXd62kkde3d3l4n6vduXWwg25E
+@chauffeurToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2Nzc5NGMzZjI1MmI4ZmJjZjJkNTI1OGUiLCJyb2xlIjoiY2hhdWZmZXVyIiwiaWF0IjoxNzM2MDAzMDA0LCJleHAiOjE3MzYwODk0MDR9.8CHH-uWxrsPdu9C8pV2WqjyfRhRSeVifeWoWthV14DQ
+
+### Test 1: Initier un paiement par carte
+POST {{baseUrl}}/paiements/initier
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+    "reservationId": "67795821a5b5159842d68d3a",
+    "methode": "carte"
+}
+
+### Test 2: Initier un paiement en espèces
+POST {{baseUrl}}/paiements/initier
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+    "reservationId": "67795821a5b5159842d68d3a",
+    "methode": "especes"
+}
+
+### Test 3: Confirmer un paiement
+POST {{baseUrl}}/paiements/confirmer/PAY-1736030892654-bxqtfl76g
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+### Test 4: Rembourser un paiement
+POST {{baseUrl}}/paiements/rembourser/PAY-1736030892654-bxqtfl76g
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+    "raison": "Annulation de la course par le client"
+} 
