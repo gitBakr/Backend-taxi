@@ -1,0 +1,9 @@
+### Variables Production
+@baseUrl = https://backend-taxi-e2lz.onrender.com/api
+@contentType = application/json
+
+### Test Health Check
+GET {{baseUrl}}/health
+
+### Test API Status
+GET {{baseUrl}}/version 

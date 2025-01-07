@@ -1,0 +1,22 @@
+### Variables Production
+@baseUrl = https://backend-taxi-e2lz.onrender.com/api
+@contentType = application/json
+
+### 1. Créer une réservation
+POST {{baseUrl}}/reservations
+Content-Type: {{contentType}}
+Authorization: Bearer {{authToken}}
+
+{
+    "chauffeur": "CHAUFFEUR_ID",
+    "trajet": {
+        "villeDepart": "Tunis",
+        "villeArrivee": "Sousse",
+        "dateDepart": "{{$datetime iso8601 1}}",
+        "dureeEstimee": 120
+    }
+}
+
+### 2. Obtenir une réservation
+GET {{baseUrl}}/reservations/RESERVATION_ID
+Authorization: Bearer {{authToken}} 

@@ -1,0 +1,31 @@
+### Variables Production
+@baseUrl = https://backend-taxi-e2lz.onrender.com/api
+@contentType = application/json
+
+### 1. Créer un nouveau client
+POST {{baseUrl}}/clients
+Content-Type: {{contentType}}
+
+{
+    "nom": "Test Prod",
+    "prenom": "Client",
+    "email": "test.prod@example.com",
+    "telephone": "+21698765441"
+}
+
+### 2. Demander OTP
+POST {{baseUrl}}/auth/send-otp
+Content-Type: {{contentType}}
+
+{
+    "telephone": "+21698765441"
+}
+
+### 3. Vérifier OTP
+POST {{baseUrl}}/auth/verify-otp
+Content-Type: {{contentType}}
+
+{
+    "telephone": "+21698765441",
+    "code": "123456"
+} 

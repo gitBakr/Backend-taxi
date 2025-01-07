@@ -1,0 +1,33 @@
+### Variables Production
+@baseUrl = https://backend-taxi-e2lz.onrender.com/api
+@contentType = application/json
+@stripeKey = sk_test_51OgnMoHyjf3wZJG1...
+
+### 1. Créer un paiement
+POST {{baseUrl}}/paiements/initier
+Content-Type: {{contentType}}
+Authorization: Bearer {{authToken}}
+
+{
+    "reservationId": "RESERVATION_ID",
+    "methode": "carte",
+    "montant": 100
+}
+
+### 2. Webhook Stripe Test
+POST {{baseUrl}}/webhooks/stripe
+Content-Type: application/json
+Stripe-Signature: t=123,v1=abc
+
+{
+    "type": "payment_intent.succeeded",
+    "data": {
+        "object": {
+            "id": "pi_test",
+            "amount": 10000,
+            "metadata": {
+                "reservationId": "RESERVATION_ID"
+            }
+        }
+    }
+} 
