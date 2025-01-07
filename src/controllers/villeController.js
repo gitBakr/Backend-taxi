@@ -5,14 +5,17 @@ const { calculerPrix } = require('../services/prixService');
 
 exports.getAllVilles = async (req, res) => {
     try {
-        const villes = await Ville.find({ active: true })
-                                .sort({ nom: 1 });
-        res.status(200).json({
+        const villes = await Ville.find({})
+            .select('nom gouvernorat region coordinates')
+            .sort('nom');
+        
+        res.json({
             status: 'success',
+            count: villes.length,
             data: villes
         });
     } catch (error) {
-        res.status(400).json({
+        res.status(500).json({
             status: 'error',
             message: error.message
         });
@@ -79,41 +82,17 @@ exports.estimerTrajet = async (req, res) => {
 
 exports.getVillesDisponibles = async (req, res) => {
     try {
-        // Trouver les villes qui ont des chauffeurs disponibles
-        const villesAvecChauffeurs = await Tarif.aggregate([
-            {
-                $lookup: {
-                    from: 'chauffeurs',
-                    localField: 'chauffeur',
-                    foreignField: '_id',
-                    as: 'chauffeur'
-                }
-            },
-            {
-                $match: {
-                    'chauffeur.disponible': true
-                }
-            },
-            {
-                $group: {
-                    _id: '$villeDepart',
-                    nombreChauffeurs: { $sum: 1 }
-                }
-            }
-        ]);
-
-        const villeIds = villesAvecChauffeurs.map(v => v._id);
-        const villes = await Ville.find({
-            _id: { $in: villeIds },
-            active: true
-        });
-
-        res.status(200).json({
+        const villes = await Ville.find({ active: true })
+            .select('nom gouvernorat region coordinates')
+            .sort('nom');
+        
+        res.json({
             status: 'success',
+            count: villes.length,
             data: villes
         });
     } catch (error) {
-        res.status(400).json({
+        res.status(500).json({
             status: 'error',
             message: error.message
         });

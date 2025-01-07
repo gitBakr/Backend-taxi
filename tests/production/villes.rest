@@ -1,0 +1,26 @@
+### Variables Production
+@baseUrl = https://backend-taxi-e2lz.onrender.com/api
+@contentType = application/json
+
+### 1. Lister toutes les villes
+GET {{baseUrl}}/villes
+Content-Type: {{contentType}}
+
+### 2. Lister les villes disponibles
+GET {{baseUrl}}/villes/disponibles
+Content-Type: {{contentType}}
+
+### 3. Rechercher une ville
+GET {{baseUrl}}/villes/search?q=tunis
+Content-Type: {{contentType}}
+
+### 4. Obtenir les villes proches
+GET {{baseUrl}}/villes/proche
+    ?lat=36.8065
+    &lng=10.1815
+    &rayon=50
+Content-Type: {{contentType}}
+
+### 5. Obtenir les trajets disponibles
+GET {{baseUrl}}/villes/trajets-disponibles
+Content-Type: {{contentType}} 
