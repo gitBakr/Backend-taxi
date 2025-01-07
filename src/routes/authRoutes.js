@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/authController');
-const OTP = require('../models/otp');
+const OTP = require('../models/OTP');
 
 // Routes d'authentification
 router.post('/send-otp', authController.sendOTP);
