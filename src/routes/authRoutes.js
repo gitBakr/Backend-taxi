@@ -34,4 +34,37 @@ if (process.env.NODE_ENV !== 'production') {
   });
 }
 
+// Route temporaire pour tester (À SUPPRIMER EN PRODUCTION)
+router.get('/test-otp/:telephone', async (req, res) => {
+  try {
+    const lastOTP = await OTP.findOne(
+      { telephone: req.params.telephone },
+      {},
+      { sort: { createdAt: -1 } }
+    );
+
+    if (!lastOTP) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Aucun code trouvé pour ce numéro'
+      });
+    }
+
+    res.json({
+      status: 'success',
+      data: {
+        telephone: lastOTP.telephone,
+        code: lastOTP.code,
+        createdAt: lastOTP.createdAt,
+        expiresAt: lastOTP.expiresAt
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      message: error.message
+    });
+  }
+});
+
 module.exports = router; 
