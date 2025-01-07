@@ -3,43 +3,45 @@ const Ville = require('../models/Ville');
 
 exports.estimerPrix = async (req, res) => {
     try {
-        const { 
-            depart, departLat, departLng,
-            arrivee, arriveeLat, arriveeLng,
-            date, passagers, options 
-        } = req.query;
+        const { depart, arrivee, passagers = 1, options = '' } = req.query;
 
-        // Créer les objets ville avec coordonnées
-        const villeDepart = {
-            nom: depart,
-            coordinates: {
-                lat: parseFloat(departLat),
-                lng: parseFloat(departLng)
-            }
-        };
+        // Recherche des villes
+        const [villeDepart, villeArrivee] = await Promise.all([
+            Ville.findOne({ 
+                nom: { $regex: new RegExp(`^${depart}$`, 'i') }
+            }).select('nom coordinates location'),
+            Ville.findOne({ 
+                nom: { $regex: new RegExp(`^${arrivee}$`, 'i') }
+            }).select('nom coordinates location')
+        ]);
 
-        const villeArrivee = {
-            nom: arrivee,
-            coordinates: {
-                lat: parseFloat(arriveeLat),
-                lng: parseFloat(arriveeLng)
-            }
-        };
+        if (!villeDepart || !villeArrivee) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'Ville de départ ou d\'arrivée non trouvée'
+            });
+        }
 
         // Calculer le prix
-        const prix = await PrixService.calculerPrix(
+        const resultat = await PrixService.calculerPrix(
             villeDepart,
             villeArrivee,
             {
-                date,
                 passagers: parseInt(passagers),
-                climatisation: options?.includes('climatisation')
+                climatisation: options.includes('climatisation')
             }
         );
 
-        res.json({ 
-            status: 'success', 
-            data: prix 
+        res.json({
+            status: 'success',
+            data: {
+                prix: resultat.montant,
+                details: {
+                    ...resultat.details,
+                    villeDepart: villeDepart.nom,
+                    villeArrivee: villeArrivee.nom
+                }
+            }
         });
 
     } catch (error) {

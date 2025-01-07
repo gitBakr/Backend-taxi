@@ -26,7 +26,7 @@ app.post('/api/webhooks/stripe', express.raw({ type: 'application/json' }), webh
 app.use(express.json());
 
 // Routes API (ordre important)
-app.use('/api', baseRoutes);  // Routes de base en premier
+app.use('/api', baseRoutes);  // Doit être en premier
 app.use('/api/auth', authRoutes);
 app.use('/api/clients', clientRoutes);
 app.use('/api/villes', villeRoutes);
