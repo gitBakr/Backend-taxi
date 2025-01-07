@@ -9,8 +9,9 @@ class PrixService {
     async calculerPrix(villeDepart, villeArrivee, options = {}) {
         try {
             // Validation des coordonnées
-            DistanceService.validateCoordinates(villeDepart.coordinates);
-            DistanceService.validateCoordinates(villeArrivee.coordinates);
+            if (!villeDepart?.coordinates || !villeArrivee?.coordinates) {
+                throw new Error('Coordonnées invalides');
+            }
 
             // Calculer la distance
             const distance = DistanceService.calculerDistance(
@@ -18,39 +19,45 @@ class PrixService {
                 villeArrivee.coordinates
             );
 
-            // Prix de base
-            let prix = Math.max(
-                this.prixMinimum,
-                distance * this.prixParKm
-            );
+            // Prix de base et calculs
+            const prixBase = this.prixParKm;
+            let montant = Math.max(this.prixMinimum, distance * prixBase);
 
-            // Ajustements selon les options
-            if (options.passagers > 4) {
-                prix *= 1.5;  // Supplément pour plus de 4 passagers
-            }
-
-            if (options.climatisation) {
-                prix += 5;  // Supplément climatisation
-            }
-
-            // Arrondir à 2 décimales
-            prix = Math.round(prix * 100) / 100;
-
-            return {
-                montant: prix,
-                details: {
-                    distance,
-                    prixBase: this.prixParKm,
-                    supplements: {
-                        passagers: options.passagers > 4 ? 'x1.5' : 'x1',
-                        climatisation: options.climatisation ? '+5' : '0'
-                    },
-                    duree: Math.round(distance * 1.2)  // Estimation en minutes
+            // Structure de réponse exacte pour le frontend
+            const response = {
+                status: 'success',
+                data: {
+                    montant: montant,
+                    details: {
+                        prixBase: prixBase,
+                        distance: distance,
+                        supplements: {
+                            passagers: 'x1',
+                            climatisation: '0'
+                        },
+                        duree: Math.round(distance * 1.2)
+                    }
                 }
             };
 
+            // Appliquer les suppléments après
+            if (options.passagers > 4) {
+                montant *= 1.5;
+                response.data.details.supplements.passagers = 'x1.5';
+            }
+            if (options.climatisation) {
+                montant += 5;
+                response.data.details.supplements.climatisation = '+5';
+            }
+
+            // Mettre à jour le montant final
+            response.data.montant = Math.round(montant * 100) / 100;
+
+            console.log('✅ Réponse prix:', response);
+            return response;
+
         } catch (error) {
-            console.error('Erreur calcul prix:', error);
+            console.error('❌ Erreur calcul prix:', error);
             throw new Error(`Erreur calcul prix: ${error.message}`);
         }
     }
