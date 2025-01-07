@@ -1,0 +1,43 @@
+### Variables
+@baseUrl = http://localhost:3002/api
+@contentType = application/json
+
+### 1. Test estimation prix Tunis -> Sousse
+GET {{baseUrl}}/prix/estimation-instantanee
+    ?lat=36.8065
+    &lng=10.1815
+    &villeArriveeId=677a60300586dd1da5f669c1
+    &options=climatisation
+Content-Type: {{contentType}}
+
+### 2. Test estimation prix avec majorations (weekend + nuit)
+GET {{baseUrl}}/prix/estimation-instantanee
+    ?lat=36.8065
+    &lng=10.1815
+    &villeArriveeId=677a60300586dd1da5f669c1
+    &options=climatisation
+    &isWeekend=true
+    &isNuit=true
+Content-Type: {{contentType}}
+
+### 3. Test coordonnées invalides
+GET {{baseUrl}}/prix/estimation-instantanee
+    ?lat=0
+    &lng=0
+    &villeArriveeId=677a60300586dd1da5f669c1
+Content-Type: {{contentType}}
+
+### 4. Test ville inexistante
+GET {{baseUrl}}/prix/estimation-instantanee
+    ?lat=36.8065
+    &lng=10.1815
+    &villeArriveeId=invalid_id
+Content-Type: {{contentType}}
+
+### 5. Test heure de pointe
+GET {{baseUrl}}/prix/estimation-instantanee
+    ?lat=36.8065
+    &lng=10.1815
+    &villeArriveeId=677a60300586dd1da5f669c1
+    &isHeurePointe=true
+Content-Type: {{contentType}} 

@@ -1,0 +1,77 @@
+### Variables
+@baseUrl = http://localhost:3000/api
+@contentType = application/json
+
+### 1. Créer un nouveau chauffeur
+POST {{baseUrl}}/chauffeurs
+Content-Type: {{contentType}}
+
+{
+    "nom": "Ben Salah",
+    "prenom": "Mohamed1",
+    "email": "mohamed.bs21@example.com",
+    "telephone": "+21612345671",
+    "vehicule": {
+        "marque": "Mercedes",
+        "modele": "Classe E",
+        "annee": 2022,
+        "photo": "url_photo_vehicule"
+    },
+    "photoChauffeur": "url_photo_chauffeur",
+    "tarifs": [
+        {
+            "villeDepart": "Tunis",
+            "villeArrivee": "Sousse",
+            "prix": 120
+        }
+    ]
+}
+
+### 2. Demander un code OTP
+POST {{baseUrl}}/auth/send-otp
+Content-Type: {{contentType}}
+
+{
+    "telephone": "+21612345679"
+}
+
+### 3. Vérifier le code OTP et obtenir le token
+# @name login
+POST {{baseUrl}}/auth/verify-otp
+Content-Type: {{contentType}}
+
+{
+    "telephone": "+21612345679",
+    "code": "XXXXX"  # Remplacer par le code reçu
+}
+
+### Sauvegarder le token
+@authToken = {{login.response.body.data.token}}
+
+### 4. Obtenir le profil chauffeur
+GET {{baseUrl}}/chauffeurs/profile
+Authorization: Bearer {{authToken}}
+
+### 5. Mettre à jour le profil
+PATCH {{baseUrl}}/chauffeurs/profile
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+    "email": "mohamed.updated@example.com",
+    "vehicule": {
+        "marque": "Mercedes",
+        "modele": "Classe S",
+        "annee": 2024,
+        "photo": "nouvelle_url_photo"
+    }
+}
+
+### 6. Mettre à jour la disponibilité
+PATCH {{baseUrl}}/chauffeurs/disponibilite
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+    "disponible": false
+} 

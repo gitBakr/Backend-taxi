@@ -1,0 +1,43 @@
+### Variables
+@baseUrl = http://localhost:3002/api
+@contentType = application/json
+
+### 1. Test distance Tunis -> Sousse
+GET {{baseUrl}}/distance/calculate
+    ?originLat=36.8065
+    &originLng=10.1815
+    &destLat=35.8245
+    &destLng=10.6346
+Content-Type: {{contentType}}
+
+### 2. Test distance Tunis -> Sfax
+GET {{baseUrl}}/distance/calculate
+    ?originLat=36.8065
+    &originLng=10.1815
+    &destLat=34.7398
+    &destLng=10.7600
+Content-Type: {{contentType}}
+
+### 3. Test distance Tunis -> Gabès
+GET {{baseUrl}}/distance/calculate
+    ?originLat=36.8065
+    &originLng=10.1815
+    &destLat=33.8881
+    &destLng=10.0975
+Content-Type: {{contentType}}
+
+### 4. Test distance Sousse -> Monastir
+GET {{baseUrl}}/distance/calculate
+    ?originLat=35.8245
+    &originLng=10.6346
+    &destLat=35.7643
+    &destLng=10.8113
+Content-Type: {{contentType}}
+
+### 5. Test distance Djerba -> Zarzis
+GET {{baseUrl}}/distance/calculate
+    ?originLat=33.8075
+    &originLng=10.8451
+    &destLat=33.5041
+    &destLng=11.1122
+Content-Type: {{contentType}} 

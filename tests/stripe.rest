@@ -1,0 +1,77 @@
+### Variables
+@baseUrl = http://localhost:3000/api
+@contentType = application/json
+@authToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2Nzc5NGYyZTI1MmI4ZmJjZjJkNTI1YTkiLCJyb2xlIjoiY2xpZW50IiwiaWF0IjoxNzM2MDMwNTgyLCJleHAiOjE3MzYxMTY5ODJ9.6ITUTVjMQfcILawvJEXd62kkde3d3l4n6vduXWwg25E
+
+### Test 1: Créer un paiement avec succès
+POST {{baseUrl}}/paiements/initier
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+    "reservationId": "67795821a5b5159842d68d3a",
+    "methode": "carte",
+    "paymentMethod": {
+        "type": "card",
+        "token": "tok_visa"
+    }
+}
+
+### Test 2: Créer un paiement avec carte 3D Secure
+POST {{baseUrl}}/paiements/initier
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+    "reservationId": "67795821a5b5159842d68d3a",
+    "methode": "carte",
+    "paymentMethod": {
+        "type": "card",
+        "token": "tok_visa_3ds2"
+    }
+}
+
+### Test 3: Créer un paiement qui échoue
+POST {{baseUrl}}/paiements/initier
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+    "reservationId": "67795821a5b5159842d68d3a",
+    "methode": "carte",
+    "paymentMethod": {
+        "type": "card",
+        "token": "tok_chargeDeclined"
+    }
+}
+
+### Test 4: Confirmer un paiement avec succès
+# Utiliser l'ID du Test 1
+POST {{baseUrl}}/paiements/confirmer/pi_3QdhWTHyjf3wZJG11SqtFpZm
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+    "card": "tok_visa",
+    "confirmation": true
+}
+
+### Test 5: Confirmer un paiement qui échoue
+POST {{baseUrl}}/paiements/confirmer/pi_3QdhYFHyjf3wZJG11wZoT6CY
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+    "card": "tok_chargeDeclined",
+    "confirmation": true
+}
+
+### Test 6: Rembourser un paiement
+POST {{baseUrl}}/paiements/rembourser/pi_3QdhWTHyjf3wZJG11SqtFpZm
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+    "montant": 132,
+    "raison": "requested_by_customer"
+}

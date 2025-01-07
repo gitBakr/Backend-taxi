@@ -1,0 +1,26 @@
+### Variables
+@baseUrl = http://localhost:3002/api
+@contentType = application/json
+
+### ROUTES PUBLIQUES CHAUFFEURS ###
+
+### 1. Obtenir tous les chauffeurs
+GET {{baseUrl}}/chauffeurs
+
+### 2. Filtrer les chauffeurs disponibles
+GET {{baseUrl}}/chauffeurs?disponible=true
+
+### 3. Filtrer les chauffeurs par ville
+GET {{baseUrl}}/chauffeurs?ville=Tunis
+
+### 4. Rechercher des chauffeurs
+GET {{baseUrl}}/chauffeurs/search?q=Ben Salah
+
+### 5. Filtrer par tarif
+GET {{baseUrl}}/chauffeurs?villeDepart=Tunis&villeArrivee=Sousse&prixMax=150
+
+### 6. Obtenir un chauffeur spécifique avec ses avis
+GET {{baseUrl}}/chauffeurs/6779315efc3b9c19282d0c40?include=avis
+
+### 7. Trier par note moyenne
+GET {{baseUrl}}/chauffeurs?sort=note&order=desc 

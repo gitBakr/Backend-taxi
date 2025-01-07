@@ -1,0 +1,45 @@
+### Variables
+@baseUrl = http://localhost:3000/api
+@contentType = application/json
+@timestamp = {{$timestamp}}
+@webhookSecret = whsec_3191982797ca8839f6f2dd5ca5a6cced6c68285fbd1cc1054c02db1af9b8aa82
+
+### Test Webhook - Paiement réussi
+POST {{baseUrl}}/webhooks/stripe
+Content-Type: application/json
+Stripe-Signature: t={{timestamp}},v1={{webhookSecret}}
+
+{
+    "id": "evt_test_webhook",
+    "object": "event",
+    "api_version": "2023-10-16",
+    "created": {{timestamp}},
+    "type": "payment_intent.succeeded",
+    "data": {
+        "object": {
+            "id": "pi_3QdhWTHyjf3wZJG11SqtFpZm",
+            "object": "payment_intent",
+            "amount": 13200,
+            "currency": "eur",
+            "status": "succeeded"
+        }
+    }
+} 
+### 1. Créer un nouveau client
+POST {{baseUrl}}/clients
+Content-Type: {{contentType}}
+
+{
+    "nom": "Test",
+    "prenom": "Client",
+    "email": "test@example.com",
+    "telephone": "+21698765440"
+}
+
+### 2. Demander OTP
+POST {{baseUrl}}/auth/send-otp
+Content-Type: {{contentType}}
+
+{
+    "telephone": "+21698765440"
+}

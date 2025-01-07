@@ -1,0 +1,27 @@
+### Variables
+@baseUrl = http://localhost:3002/api
+@contentType = application/json
+
+### 1. Obtenir le token (copier depuis la réponse de auth.rest)
+@authToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2Nzc5MzEyNmZjM2I5YzE5MjgyZDBjM2QiLCJyb2xlIjoiY2xpZW50IiwiaWF0IjoxNzM1OTk5ODUyLCJleHAiOjE3MzYwODYyNTJ9.eLCAPOS1wGMmoHlv0RyzdAYDgn1OXC34cZ5d_zspG3g
+
+### 2. Accéder au profil (Route protégée)
+GET {{baseUrl}}/clients/profile
+Authorization: Bearer {{authToken}}
+
+### 3. Test avec token invalide
+GET {{baseUrl}}/clients/profile
+Authorization: Bearer invalid_token
+
+### 4. Test sans token
+GET {{baseUrl}}/clients/profile
+
+### 5. Mettre à jour le profil (Route protégée)
+PATCH {{baseUrl}}/clients/profile
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+    "nom": "Nouveau Nom",
+    "email": "nouveau@email.com"
+} 
