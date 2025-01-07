@@ -8,12 +8,12 @@ class PrixService {
 
     async calculerPrix(villeDepart, villeArrivee, options = {}) {
         try {
-            if (!villeDepart?.coordinates || !villeArrivee?.coordinates) {
-                throw new Error('Coordonnées invalides');
-            }
+            // Validation des coordonnées
+            DistanceService.validateCoordinates(villeDepart.coordinates);
+            DistanceService.validateCoordinates(villeArrivee.coordinates);
 
             // Calculer la distance
-            const distance = await DistanceService.calculerDistance(
+            const distance = DistanceService.calculerDistance(
                 villeDepart.coordinates,
                 villeArrivee.coordinates
             );

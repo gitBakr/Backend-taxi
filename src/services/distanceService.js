@@ -2,51 +2,52 @@ const axios = require('axios');
 require('dotenv').config();
 
 class DistanceService {
-    async getDistance(origin, destination) {
+    constructor() {
+        this.EARTH_RADIUS = 6371; // Rayon de la Terre en km
+    }
+
+    calculerDistance(coordsDepart, coordsArrivee) {
         try {
-            // Utiliser OSRM (OpenStreetMap)
-            const response = await axios.get(
-                `https://router.project-osrm.org/route/v1/driving/${origin.lng},${origin.lat};${destination.lng},${destination.lat}`
-            );
+            const lat1 = this.toRadians(coordsDepart.latitude);
+            const lon1 = this.toRadians(coordsDepart.longitude);
+            const lat2 = this.toRadians(coordsArrivee.latitude);
+            const lon2 = this.toRadians(coordsArrivee.longitude);
 
-            if (response.data.code !== 'Ok') {
-                return this.calculateHaversineDistance(origin, destination);
-            }
+            // Formule de Haversine
+            const dLat = lat2 - lat1;
+            const dLon = lon2 - lon1;
 
-            const route = response.data.routes[0];
-            return {
-                distance: route.distance / 1000, // Convertir en km
-                duration: route.duration / 60,   // Convertir en minutes
-                status: 'success'
-            };
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                    Math.cos(lat1) * Math.cos(lat2) * 
+                    Math.sin(dLon/2) * Math.sin(dLon/2);
+            
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            const distance = this.EARTH_RADIUS * c;
+
+            // Arrondir à 2 décimales
+            return Math.round(distance * 100) / 100;
         } catch (error) {
-            console.error('Erreur OSRM:', error);
-            // Fallback sur calcul simple
-            return this.calculateHaversineDistance(origin, destination);
+            console.error('Erreur calcul distance:', error);
+            throw new Error('Erreur lors du calcul de la distance');
         }
     }
 
-    calculateHaversineDistance(origin, destination) {
-        const R = 6371;
-        const dLat = this.toRad(destination.lat - origin.lat);
-        const dLon = this.toRad(destination.lng - origin.lng);
-        const lat1 = this.toRad(origin.lat);
-        const lat2 = this.toRad(destination.lat);
-
-        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                Math.sin(dLon/2) * Math.sin(dLon/2) * Math.cos(lat1) * Math.cos(lat2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        const distance = R * c;
-
-        return {
-            distance,
-            duration: distance * 1.2, // Estimation du temps en minutes
-            status: 'estimated'
-        };
+    toRadians(degrees) {
+        return degrees * (Math.PI/180);
     }
 
-    toRad(value) {
-        return value * Math.PI / 180;
+    // Méthode pour vérifier si les coordonnées sont valides
+    validateCoordinates(coords) {
+        if (!coords || typeof coords.latitude !== 'number' || typeof coords.longitude !== 'number') {
+            throw new Error('Coordonnées invalides');
+        }
+        if (coords.latitude < -90 || coords.latitude > 90) {
+            throw new Error('Latitude invalide');
+        }
+        if (coords.longitude < -180 || coords.longitude > 180) {
+            throw new Error('Longitude invalide');
+        }
+        return true;
     }
 }
 
