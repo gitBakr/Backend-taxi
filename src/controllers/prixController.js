@@ -3,9 +3,12 @@ const Ville = require('../models/Ville');
 
 exports.estimerPrix = async (req, res) => {
     try {
+        console.log('\n📊 ESTIMATION PRIX');
+        console.log('Paramètres:', req.query);
+
         const { depart, arrivee, passagers = 1, options = '' } = req.query;
 
-        // Recherche des villes
+        // Recherche des villes (insensible à la casse)
         const [villeDepart, villeArrivee] = await Promise.all([
             Ville.findOne({ 
                 nom: { $regex: new RegExp(`^${depart}$`, 'i') }
@@ -15,10 +18,20 @@ exports.estimerPrix = async (req, res) => {
             }).select('nom coordinates location')
         ]);
 
+        console.log('Ville départ trouvée:', villeDepart);
+        console.log('Ville arrivée trouvée:', villeArrivee);
+
         if (!villeDepart || !villeArrivee) {
             return res.status(400).json({
                 status: 'error',
-                message: 'Ville de départ ou d\'arrivée non trouvée'
+                message: `Ville${!villeDepart ? ' de départ' : ''}${!villeArrivee ? ' d\'arrivée' : ''} non trouvée`
+            });
+        }
+
+        if (!villeDepart.coordinates || !villeArrivee.coordinates) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'Coordonnées manquantes pour une ou plusieurs villes'
             });
         }
 
@@ -32,20 +45,11 @@ exports.estimerPrix = async (req, res) => {
             }
         );
 
-        res.json({
-            status: 'success',
-            data: {
-                prix: resultat.montant,
-                details: {
-                    ...resultat.details,
-                    villeDepart: villeDepart.nom,
-                    villeArrivee: villeArrivee.nom
-                }
-            }
-        });
+        console.log('Résultat calcul:', resultat);
+        res.json(resultat);
 
     } catch (error) {
-        console.error('Erreur estimation prix:', error);
+        console.error('❌ Erreur estimation prix:', error);
         res.status(400).json({
             status: 'error',
             message: error.message

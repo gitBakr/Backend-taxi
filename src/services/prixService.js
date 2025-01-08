@@ -19,42 +19,50 @@ class PrixService {
                 villeArrivee.coordinates
             );
 
-            // Prix de base et calculs
-            const prixBase = this.prixParKm;
-            let montant = Math.max(this.prixMinimum, distance * prixBase);
+            // Prix de base
+            let montant = Math.max(this.prixMinimum, distance * this.prixParKm);
 
-            // Structure de réponse exacte pour le frontend
-            const response = {
+            // Appliquer les suppléments
+            const supplements = {
+                passagers: 'x1',
+                climatisation: '0'
+            };
+
+            if (options.passagers > 4) {
+                montant *= 1.5;
+                supplements.passagers = 'x1.5';
+            }
+            
+            if (options.climatisation) {
+                montant += 5;
+                supplements.climatisation = '+5';
+            }
+
+            // Arrondir à 2 décimales
+            montant = Math.round(montant * 100) / 100;
+
+            // Log pour debug
+            console.log('Calcul prix:', {
+                distance,
+                montantBase: distance * this.prixParKm,
+                supplements,
+                montantFinal: montant
+            });
+
+            return {
                 status: 'success',
                 data: {
                     montant: montant,
                     details: {
-                        prixBase: prixBase,
+                        prixBase: this.prixParKm,
                         distance: distance,
-                        supplements: {
-                            passagers: 'x1',
-                            climatisation: '0'
-                        },
-                        duree: Math.round(distance * 1.2)
+                        supplements: supplements,
+                        duree: Math.round(distance * 1.2), // minutes
+                        villeDepart: villeDepart.nom,
+                        villeArrivee: villeArrivee.nom
                     }
                 }
             };
-
-            // Appliquer les suppléments après
-            if (options.passagers > 4) {
-                montant *= 1.5;
-                response.data.details.supplements.passagers = 'x1.5';
-            }
-            if (options.climatisation) {
-                montant += 5;
-                response.data.details.supplements.climatisation = '+5';
-            }
-
-            // Mettre à jour le montant final
-            response.data.montant = Math.round(montant * 100) / 100;
-
-            console.log('✅ Réponse prix:', response);
-            return response;
 
         } catch (error) {
             console.error('❌ Erreur calcul prix:', error);

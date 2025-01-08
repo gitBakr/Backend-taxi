@@ -1,5 +1,4 @@
 const axios = require('axios');
-require('dotenv').config();
 
 class DistanceService {
     constructor() {
@@ -8,6 +7,16 @@ class DistanceService {
 
     calculerDistance(coordsDepart, coordsArrivee) {
         try {
+            // Debug log
+            console.log('Calcul distance entre:', {
+                depart: coordsDepart,
+                arrivee: coordsArrivee
+            });
+
+            // Vérification des coordonnées
+            this.validateCoordinates(coordsDepart);
+            this.validateCoordinates(coordsArrivee);
+
             const lat1 = this.toRadians(coordsDepart.latitude);
             const lon1 = this.toRadians(coordsDepart.longitude);
             const lat2 = this.toRadians(coordsArrivee.latitude);
@@ -24,11 +33,14 @@ class DistanceService {
             const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
             const distance = this.EARTH_RADIUS * c;
 
+            // Debug log
+            console.log('Distance calculée:', distance, 'km');
+
             // Arrondir à 2 décimales
             return Math.round(distance * 100) / 100;
         } catch (error) {
             console.error('Erreur calcul distance:', error);
-            throw new Error('Erreur lors du calcul de la distance');
+            throw new Error('Erreur lors du calcul de la distance: ' + error.message);
         }
     }
 
@@ -36,16 +48,16 @@ class DistanceService {
         return degrees * (Math.PI/180);
     }
 
-    // Méthode pour vérifier si les coordonnées sont valides
     validateCoordinates(coords) {
         if (!coords || typeof coords.latitude !== 'number' || typeof coords.longitude !== 'number') {
-            throw new Error('Coordonnées invalides');
+            console.error('Coordonnées invalides:', coords);
+            throw new Error('Coordonnées invalides ou manquantes');
         }
         if (coords.latitude < -90 || coords.latitude > 90) {
-            throw new Error('Latitude invalide');
+            throw new Error('Latitude invalide: ' + coords.latitude);
         }
         if (coords.longitude < -180 || coords.longitude > 180) {
-            throw new Error('Longitude invalide');
+            throw new Error('Longitude invalide: ' + coords.longitude);
         }
         return true;
     }
