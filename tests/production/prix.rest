@@ -1,50 +1,34 @@
 ### Variables Production
-@baseUrl = http://localhost:3002/api
+@baseUrl = https://backend-taxi-e2lz.onrender.com/api
 @contentType = application/json
 
-### 1. Test simple estimation prix
+### Test estimation Djerba-Tataouine
 GET {{baseUrl}}/prix/estimation
-    ?depart=tunis
-    &arrivee=sousse
+    ?depart=djerba
+    &arrivee=tataouine
     &passagers=2
     &options=climatisation
 Content-Type: {{contentType}}
 
-### 2. Test avec plus de passagers
+### Test avec plus de passagers
 GET {{baseUrl}}/prix/estimation
-    ?depart=tunis
-    &arrivee=sousse
+    ?depart=djerba
+    &arrivee=tataouine
     &passagers=5
     &options=climatisation
 Content-Type: {{contentType}}
 
-### 3. Test sans climatisation
+### Test sans climatisation
 GET {{baseUrl}}/prix/estimation
-    ?depart=tunis
-    &arrivee=sousse
+    ?depart=djerba
+    &arrivee=tataouine
     &passagers=2
 Content-Type: {{contentType}}
 
-### 4. Test avec ville inconnue
-GET {{baseUrl}}/prix/estimation
-    ?depart=villeinconnue
-    &arrivee=sousse
-    &passagers=2
-Content-Type: {{contentType}}
-
-### 5. Test détaillé avec logs
-GET {{baseUrl}}/prix/estimation
-    ?depart=tunis
-    &arrivee=sousse
-    &passagers=2
-    &options=climatisation
-    &debug=true
-Content-Type: {{contentType}}
-
-### 6. Test calcul distance seule
+### Test calcul distance seule
 GET {{baseUrl}}/distance/calculate
-    ?originLat=36.8065
-    &originLng=10.1815
-    &destLat=35.8245
-    &destLng=10.6346
+    ?originLat=33.8075
+    &originLng=10.8451
+    &destLat=32.9297
+    &destLng=10.4518
 Content-Type: {{contentType}} 
