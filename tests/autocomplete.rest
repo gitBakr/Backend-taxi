@@ -1,0 +1,23 @@
+### Variables
+@baseUrl = http://localhost:3002/api
+@contentType = application/json
+
+### Test autocomplétion - recherche vide (villes populaires)
+GET {{baseUrl}}/villes/autocomplete
+Content-Type: {{contentType}}
+
+### Test autocomplétion - "tun"
+GET {{baseUrl}}/villes/autocomplete?q=tun
+Content-Type: {{contentType}}
+
+### Test autocomplétion - "sou"
+GET {{baseUrl}}/villes/autocomplete?q=sou
+Content-Type: {{contentType}}
+
+### Test autocomplétion avec limite
+GET {{baseUrl}}/villes/autocomplete?q=s&limit=3
+Content-Type: {{contentType}}
+
+### Test autocomplétion par gouvernorat
+GET {{baseUrl}}/villes/autocomplete?q=sfax
+Content-Type: {{contentType}} 

@@ -1,0 +1,18 @@
+### Variables
+@baseUrl = http://localhost:3002/api
+@contentType = application/json
+
+### Test format réponse estimation prix
+GET {{baseUrl}}/prix/estimation
+    ?depart=tunis
+    &arrivee=sousse
+    &passagers=2
+    &options=climatisation
+Content-Type: {{contentType}}
+
+### Test format sans options
+GET {{baseUrl}}/prix/estimation
+    ?depart=tunis
+    &arrivee=sousse
+    &passagers=1
+Content-Type: {{contentType}} 

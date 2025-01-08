@@ -1,0 +1,15 @@
+### Variables
+@baseUrl = http://localhost:3002/api
+@contentType = application/json
+
+### Test format réponse - recherche "tun"
+GET {{baseUrl}}/villes/autocomplete?q=tun
+Content-Type: {{contentType}}
+
+### Test format réponse - recherche vide (villes populaires)
+GET {{baseUrl}}/villes/autocomplete
+Content-Type: {{contentType}}
+
+### Test format réponse - avec limite
+GET {{baseUrl}}/villes/autocomplete?q=s&limit=2
+Content-Type: {{contentType}} 

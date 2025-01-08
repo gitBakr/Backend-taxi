@@ -27,5 +27,6 @@ router.get('/liste', async (req, res) => {
     });
   }
 });
+router.get('/autocomplete', villeController.autocomplete);
 
 module.exports = router; 

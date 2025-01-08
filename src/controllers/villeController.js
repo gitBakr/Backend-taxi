@@ -333,7 +333,8 @@ exports.searchVilles = async (req, res) => {
 // Trouver la ville la plus proche
 exports.getVilleProche = async (req, res) => {
     try {
-        const { lat, lng } = req.query;
+        const { lat, lng, rayon = 50 } = req.query;
+        
         if (!lat || !lng) {
             return res.status(400).json({
                 status: 'error',
@@ -345,28 +346,115 @@ exports.getVilleProche = async (req, res) => {
             {
                 $geoNear: {
                     near: {
-                        type: "Point",
+                        type: 'Point',
                         coordinates: [parseFloat(lng), parseFloat(lat)]
                     },
-                    distanceField: "distance",
-                    spherical: true,
-                    maxDistance: 50000 // 50km
+                    distanceField: 'distance',
+                    maxDistance: parseInt(rayon) * 1000, // Convertir en mètres
+                    spherical: true
                 }
             },
-            { $limit: 5 }
+            {
+                $project: {
+                    nom: 1,
+                    gouvernorat: 1,
+                    region: 1,
+                    coordinates: 1,
+                    distance: 1
+                }
+            }
         ]);
 
-        res.status(200).json({
+        res.json({
             status: 'success',
-            data: {
-                villePlusProche: villes[0],
-                villesProches: villes.slice(1)
-            }
+            count: villes.length,
+            data: villes.map(ville => ({
+                ...ville,
+                distance: Math.round(ville.distance / 1000) // Convertir en km
+            }))
         });
+
     } catch (error) {
-        res.status(400).json({
+        console.error('Erreur recherche ville proche:', error);
+        res.status(500).json({
             status: 'error',
             message: error.message
         });
     }
+};
+
+// Ajouter cette nouvelle méthode
+exports.autocomplete = async (req, res) => {
+    try {
+        const { q = '', limit = 5 } = req.query;
+        
+        // Si la requête est vide, retourner les villes les plus populaires
+        if (!q.trim()) {
+            const villesPopulaires = await Ville.find({})
+                .select('nom gouvernorat coordinates')
+                .limit(parseInt(limit));
+            
+            return res.json({
+                status: 'success',
+                data: villesPopulaires
+            });
+        }
+
+        // Recherche avec regex insensible à la casse et aux accents
+        const villes = await Ville.find({
+            $or: [
+                { 
+                    nom: { 
+                        $regex: new RegExp(q, 'i')
+                    }
+                },
+                { 
+                    gouvernorat: { 
+                        $regex: new RegExp(q, 'i')
+                    }
+                }
+            ]
+        })
+        .select('nom gouvernorat coordinates')
+        .limit(parseInt(limit));
+
+        // Ajouter un score de pertinence
+        const resultats = villes.map(ville => ({
+            ...ville.toObject(),
+            score: calculateScore(ville.nom, ville.gouvernorat, q)
+        }))
+        .sort((a, b) => b.score - a.score);
+
+        res.json({
+            status: 'success',
+            data: resultats
+        });
+
+    } catch (error) {
+        console.error('Erreur autocomplétion:', error);
+        res.status(500).json({
+            status: 'error',
+            message: error.message
+        });
+    }
+};
+
+// Fonction utilitaire pour calculer le score de pertinence
+const calculateScore = (nom, gouvernorat, query) => {
+    query = query.toLowerCase();
+    nom = nom.toLowerCase();
+    gouvernorat = gouvernorat.toLowerCase();
+    
+    let score = 0;
+    
+    // Correspondance exacte au début du nom
+    if (nom.startsWith(query)) score += 10;
+    
+    // Correspondance partielle dans le nom
+    if (nom.includes(query)) score += 5;
+    
+    // Correspondance dans le gouvernorat
+    if (gouvernorat.includes(query)) score += 3;
+    
+    return score;
 }; 
